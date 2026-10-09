@@ -1,6 +1,6 @@
-package in.project.gatekeeper.gateway.controller;
+package in.gatekeeper.management.controller;
 
-import in.project.gatekeeper.gateway.dto.responsedto.HealthResponse;
+import in.gatekeeper.management.dto.responsedto.HealthResponse;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;

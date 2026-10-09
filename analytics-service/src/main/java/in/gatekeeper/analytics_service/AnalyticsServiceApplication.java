@@ -1,4 +1,4 @@
-package in.gatekeeper.analytics;
+package in.gatekeeper.analytics_service;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;

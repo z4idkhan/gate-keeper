@@ -1,4 +1,4 @@
-package in.gatekeeper.analytics;
+package in.gatekeeper.analytics_service;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;
