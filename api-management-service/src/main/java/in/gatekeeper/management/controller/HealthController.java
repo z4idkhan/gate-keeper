@@ -1,10 +1,7 @@
 package in.gatekeeper.management.controller;
 
-import in.gatekeeper.management.dto.responsedto.HealthResponse;
 import in.gatekeeper.management.service.HealthService;
-import lombok.AllArgsConstructor;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -17,10 +14,8 @@ public class HealthController {
 
     private final HealthService healthService;
 
-
     @GetMapping
-    public ResponseEntity<HealthResponse> health() {
+    public ResponseEntity<String> health() {
         return ResponseEntity.ok(healthService.getHealth());
     }
-
 }
