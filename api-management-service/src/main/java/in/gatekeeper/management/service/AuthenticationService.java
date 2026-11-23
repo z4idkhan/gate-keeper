@@ -1,31 +1,74 @@
-
 package in.gatekeeper.management.service;
 
 import in.gatekeeper.management.dto.requestdto.LoginRequest;
 import in.gatekeeper.management.dto.responsedto.LoginResponse;
+import in.gatekeeper.management.entity.ManagementUser;
 import in.gatekeeper.management.repository.ManagementUserRepository;
-
-import jakarta.validation.Valid;
+import in.gatekeeper.management.security.JwtService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.HttpStatus;
+import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetails.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.oauth2.jwt.JwtEncoder;
-import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
 
-@RequiredArgsConstructor
+import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
+
+
 @Service
+@RequiredArgsConstructor
 public class AuthenticationService {
 
-    private final ManagementUserRepository manageUserRepo;
+    private final ManagementUserRepository userRepo;
     private final PasswordEncoder passwordEncoder;
-    private final JwtEncoder jwtEncoder;
-    private final Long expirationSeconds;
+    private final JwtService jwtService;
+    private final AuthenticationManager authenticationManager;
 
-    @Transactional(readOnly = true)
-    public LoginResponse login(@Valid LoginRequest request) {
+//    public RegisterResponse register(RegisterRequest request) {
+//
+//        if (userRepo.findByEmail(request.email()).isPresent()) {
+//            throw new ResponseStatusException(
+//                    HttpStatus.CONFLICT, "Email already registered"
+//            );
+//        }
+//
+//        ManagementUser user = new ManagementUser();
+//        user.setUsername(request.username());
+//        user.setEmail(request.email());
+//        user.setPassword(passwordEncoder.encode(request.password()));
+//        user.setRole(Role.USER);
+//
+//        User savedUser = userRepo.save(user);
+//
+//        String token = jwtService.generateToken(savedUser);
+//
+//        return new AuthResponse(token);
+//    }
 
-        // Authentication logic will go here
+    public LoginResponse login(LoginRequest request) {
 
-        return new LoginResponse();
+        authenticationManager.authenticate(
+                new UsernamePasswordAuthenticationToken(
+                        request.getEmail(),
+                        request.getPassword()
+                )
+        );
+
+        ManagementUser user = userRepo.findByEmail(request.getEmail())
+                .orElseThrow(() -> new ResponseStatusException(
+                        HttpStatus.NOT_FOUND, "User not found"
+                ));
+
+        String token = jwtService.generateToken(user);
+
+        return new LoginResponse(
+                token,
+                "Bearer",
+                3600,
+                user.getRole().getName(),
+                null
+        );
     }
 }
