@@ -1,9 +1,12 @@
 package in.gatekeeper.management.security;
 
+import in.gatekeeper.management.entity.ManagementUser;
+import in.gatekeeper.management.repository.ManagementUserRepository;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -13,7 +16,10 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Service
+@RequiredArgsConstructor
 public class JwtService {
+
+    private final ManagementUser managementUser;
 
     @Value("${jwt.secret}")
     private String secretKey;
@@ -33,17 +39,18 @@ public class JwtService {
     }
 
     // Generate JWT token
-    public String generateToken(UserDetails userDetails) {
-        return buildToken(userDetails, jwtExpiration);
+    public String generateToken(ManagementUser managementUser) {
+        return buildToken(managementUser, jwtExpiration);
     }
 
     // Build token with subject, issue time, expiry and signature
-    private String buildToken(UserDetails userDetails, long expiration) {
+    private String buildToken(ManagementUser managementUser, long expiration) {
         return Jwts.builder()
-                .subject(userDetails.getUsername())
+                .subject(managementUser.getUsername())
                 .issuedAt(new Date(System.currentTimeMillis()))
                 .expiration(new Date(System.currentTimeMillis() + expiration))
                 .signWith(getSignInKey())
+                .claim("role",managementUser.getRole())
                 .compact();
     }
 
