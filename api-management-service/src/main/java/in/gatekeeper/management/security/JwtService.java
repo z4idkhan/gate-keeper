@@ -1,11 +1,11 @@
 package in.gatekeeper.management.security;
 
-import in.gatekeeper.management.entity.ManagementUser;
-import in.gatekeeper.management.repository.ManagementUserRepository;
 import io.jsonwebtoken.Claims;
+import in.gatekeeper.management.entity.ManagementUser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.NoArgsConstructor;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -16,7 +16,6 @@ import java.util.Date;
 import java.util.function.Function;
 
 @Service
-@RequiredArgsConstructor
 public class JwtService {
 
     private final ManagementUser managementUser;
@@ -26,6 +25,10 @@ public class JwtService {
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
+
+    public JwtService(ManagementUser managementUser) {
+        this.managementUser = managementUser;
+    }
 
     // Extract username (email) from JWT
     public String extractUsername(String token) {

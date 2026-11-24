@@ -9,7 +9,6 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetails.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
@@ -22,9 +21,9 @@ import org.springframework.web.server.ResponseStatusException;
 public class AuthenticationService {
 
     private final ManagementUserRepository userRepo;
-    private final PasswordEncoder passwordEncoder;
     private final JwtService jwtService;
     private final AuthenticationManager authenticationManager;
+    private final PasswordEncoder passwordEncoder;
 
 //    public RegisterResponse register(RegisterRequest request) {
 //
@@ -64,11 +63,11 @@ public class AuthenticationService {
         String token = jwtService.generateToken(user);
 
         return new LoginResponse(
-                token,
-                "Bearer",
-                3600,
-                user.getRole().getName(),
-                null
+                token,"Bearer",3600,
+                user.getRole().getName(),null
         );
+    }
+    private RuntimeException invalidCredentials(){
+        return new RuntimeException("Invalid credentials");
     }
 }

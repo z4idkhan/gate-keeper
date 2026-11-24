@@ -1,40 +1,79 @@
 package in.gatekeeper.management.security;
+
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import org.springframework.security.access.expression.SecurityExpressionOperations;
-import org.springframework.security.core.Authentication;
+
+import lombok.RequiredArgsConstructor;
+
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.web.authentication.WebAuthenticationDetailsSource;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
 
 @Component
+@RequiredArgsConstructor
 public class JwtAuthFilter extends OncePerRequestFilter {
-    @Override
-    protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response,
-                                    FilterChain filterChain) throws ServletException, IOException {
 
-        // Get the Authorization header from the request
+    private final JwtService jwtService;
+    private final UserDetailsService userDetailsService;
+
+    @Override
+    protected void doFilterInternal(
+            HttpServletRequest request,
+            HttpServletResponse response,
+            FilterChain filterChain
+    ) throws ServletException, IOException {
+
         String authHeader = request.getHeader("Authorization");
 
-        // Check if the header is present and starts with "Bearer "
-        if (authHeader != null && authHeader.startsWith("Bearer ")) {
-            // Extract the token from the header
-            String token = authHeader.substring(7);
-
-            // Here you would typically validate the token and set the authentication in the security context
-            // For example:
-            SecurityExpressionOperations jwtService;
-            if (jwtService.validateToken(token)) {
-                Authentication auth = jwtService.getAuthentication(token);
-                 SecurityContextHolder.getContext().setAuthentication(auth);
-             }
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        // Continue with the filter chain
+        String token = authHeader.substring(7);
+
+        try {
+            String username = jwtService.extractUsername(token);
+
+            if (username != null &&
+                    SecurityContextHolder.getContext().getAuthentication() == null) {
+
+                UserDetails userDetails =
+                        userDetailsService.loadUserByUsername(username);
+
+                if (jwtService.isTokenValid(token, userDetails)) {
+
+                    UsernamePasswordAuthenticationToken auth =
+                            new UsernamePasswordAuthenticationToken(
+                                    userDetails,
+                                    null,
+                                    userDetails.getAuthorities()
+                            );
+
+                    auth.setDetails(
+                            new WebAuthenticationDetailsSource()
+                                    .buildDetails(request)
+                    );
+
+                    SecurityContextHolder.getContext()
+                            .setAuthentication(auth);
+                }
+            }
+
+        } catch (io.jsonwebtoken.JwtException |
+                 IllegalArgumentException e) {
+            SecurityContextHolder.clearContext();
+        }
+
+
         filterChain.doFilter(request, response);
     }
 }
