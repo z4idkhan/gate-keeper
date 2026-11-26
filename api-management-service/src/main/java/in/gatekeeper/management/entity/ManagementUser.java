@@ -39,6 +39,7 @@ public class ManagementUser implements UserDetails {
     private Role role;
 
     private String username;
+    private String email;
     private String passwordHash;
     private boolean enabled;
     private LocalDateTime createdAt;

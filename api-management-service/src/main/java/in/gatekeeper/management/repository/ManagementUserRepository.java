@@ -10,6 +10,6 @@ public interface ManagementUserRepository extends JpaRepository<ManagementUser,L
 
     Optional<ManagementUser>findByUserName(String username);
     Optional<ManagementUser>findByEmail(String email);
-    List<ManagementUser> findByRole(Long role);
+    // List<ManagementUser> findByRole(Long role);
 
 }

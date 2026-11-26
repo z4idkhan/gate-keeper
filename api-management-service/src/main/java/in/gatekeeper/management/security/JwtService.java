@@ -5,8 +5,6 @@ import in.gatekeeper.management.entity.ManagementUser;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
-import lombok.NoArgsConstructor;
-import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -18,17 +16,11 @@ import java.util.function.Function;
 @Service
 public class JwtService {
 
-    private final ManagementUser managementUser;
-
     @Value("${jwt.secret}")
     private String secretKey;
 
     @Value("${jwt.expiration}")
     private long jwtExpiration;
-
-    public JwtService(ManagementUser managementUser) {
-        this.managementUser = managementUser;
-    }
 
     // Extract username (email) from JWT
     public String extractUsername(String token) {

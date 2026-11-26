@@ -50,12 +50,12 @@ public class AuthenticationService {
 
         authenticationManager.authenticate(
                 new UsernamePasswordAuthenticationToken(
-                        request.getEmail(),
+                        request.getUsername(),
                         request.getPassword()
                 )
         );
 
-        ManagementUser user = userRepo.findByEmail(request.getEmail())
+        ManagementUser user = userRepo.findByUserName(request.getUsername())
                 .orElseThrow(() -> new ResponseStatusException(
                         HttpStatus.NOT_FOUND, "User not found"
                 ));
