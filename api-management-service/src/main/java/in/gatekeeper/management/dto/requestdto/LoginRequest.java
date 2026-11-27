@@ -1,3 +1,4 @@
+
 package in.gatekeeper.management.dto.requestdto;
 
 import jakarta.validation.constraints.NotBlank;
@@ -10,9 +11,6 @@ public class LoginRequest {
 
     @NotBlank
     private String username;
-
-    @NotBlank
-    private String email;
 
     @NotBlank
     private String password;
